@@ -25,6 +25,11 @@ namespace CounterBenchmarks
             m_eventCounter.WriteMetric(val);
         }
 
+        public void WriteIncrementingEventCounter(int val)
+        {
+            m_incrementingEventCounter.Increment(val);
+        }
+
         private BMCounterSource() : base(EventSourceSettings.EtwSelfDescribingEventFormat) 
         {
             // Counter names should ideally be the same length, so I'm naming them with number-suffix.

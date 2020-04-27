@@ -1,0 +1,12 @@
+*.dll
+*.so
+*.pdb
+*.json
+*.a
+*.md
+*./createdump
+*.props
+*.targets
+*.cache
+*.txt
+
