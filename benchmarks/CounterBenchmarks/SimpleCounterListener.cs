@@ -9,19 +9,45 @@ namespace CounterBenchmarks
         private readonly EventLevel _level = EventLevel.Verbose;
 
         public int EventCount { get; private set; } = 0;
+        public EventSource runtimeCounterSource;
 
         public SimpleCounterListener()
         {
+        }
+
+        protected override void OnEventSourceCreated(EventSource source)
+        {
+            if (source.Name.Equals("System.Runtime"))
+            {
+                runtimeCounterSource = source;
+            }
+        }
+
+        public void StartListening(EventSource source, int keyword)
+        {
+            EnableEvents(source, EventLevel.Informational, (EventKeywords)keyword);
         }
 
         public void StartListening(EventSource source)
         {
             EnableEvents(source, EventLevel.Informational, (EventKeywords)1, new Dictionary<string, string>(){ {"EventCounterInterval", "1" } });
         }
+
         public void StopListening(EventSource source)
         {
             DisableEvents(source);
         }
+
+        public void StartListeningRuntimeCounters()
+        {
+            EnableEvents(runtimeCounterSource, EventLevel.Informational, (EventKeywords)1, new Dictionary<string, string>(){{ "EventCounterInterval", "1" }});
+        }
+
+        public void StopListeningRuntimeCounters()
+        {
+            DisableEvents(runtimeCounterSource);
+        }
+
 
         private (String Name, String Value) getRelevantMetric(IDictionary<string, object> eventPayload)
         {
