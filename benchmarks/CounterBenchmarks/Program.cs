@@ -15,12 +15,14 @@ namespace CounterBenchmarks
         private readonly byte[] data;
 
         private readonly SimpleCounterListener listener;
+        private readonly MyDiagnosticsClient client;
 
         private EventCounter eventCounter;
 
         public Benchmark()
         {
             listener = new SimpleCounterListener();
+            client = new MyDiagnosticsClient();
         }
 
         [Benchmark]
@@ -180,6 +182,7 @@ namespace CounterBenchmarks
                 t[i] = new Thread(() => { BMCounterSource.Log.WriteEventThree(bigStr); });
                 t[i].Start();
             }
+            listener.StopListening(BMCounterSource.Log);
         }
 
 
@@ -194,6 +197,7 @@ namespace CounterBenchmarks
                 t[i] = new Thread(() => { BMCounterSource.Log.WriteEventThree(bigStr); });
                 t[i].Start();
             }
+            listener.StopListening(BMCounterSource.Log);
         }
 
         [Benchmark]
@@ -207,6 +211,7 @@ namespace CounterBenchmarks
                 t[i] = new Thread(() => { BMCounterSource.Log.WriteEventThree(bigStr); });
                 t[i].Start();
             }
+            listener.StopListening(BMCounterSource.Log);
         }
 
         [Benchmark]
@@ -220,8 +225,22 @@ namespace CounterBenchmarks
                 t[i] = new Thread(() => { BMCounterSource.Log.WriteEventThree(bigStr); });
                 t[i].Start();
             }
+            listener.StopListening(BMCounterSource.Log);
         }
 
+        [Benchmark]
+        public void WriteString1000WithClientWith50Threads()
+        {
+            client.Start("BM-Counter-Source", EventLevel.Informational, (long)3);
+            string bigStr = new string('a', 1000);
+            Thread[] t = new Thread[50];
+            for (int i = 0; i < 50; i++)
+            {
+                t[i] = new Thread(() => { BMCounterSource.Log.WriteEventThree(bigStr); });
+                t[i].Start();
+            }
+            client.Stop();
+        }
     }
 
     public class Program
