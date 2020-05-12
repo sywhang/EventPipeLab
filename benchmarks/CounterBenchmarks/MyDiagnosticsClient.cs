@@ -39,6 +39,26 @@ namespace CounterBenchmarks
             });
         }
 
+        public void StartListeningToCounters(string providerName)
+        {
+            var provider = new EventPipeProvider(providerName, EventLevel.Informational, (long)0, new Dictionary<string, string>(){{ "EventCounterInterval", "1" }});
+            m_session = m_client.StartEventPipeSession(new List<EventPipeProvider>() { provider });
+            Task streamTask = Task.Run(() =>
+            {
+                var buffer = new byte[1000];
+                while (true)
+                {
+                    try
+                    {
+                        m_session.EventStream.Read(buffer, 0, 1000);
+                    }
+                    catch (Exception e)
+                    {
+                    }
+                }
+            });
+        }
+
         public void Stop()
         {
             m_session.Stop();

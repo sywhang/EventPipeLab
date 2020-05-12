@@ -28,7 +28,7 @@ namespace CounterBenchmarks
             EnableEvents(source, EventLevel.Informational, (EventKeywords)keyword);
         }
 
-        public void StartListening(EventSource source)
+        public void StartListeningToCounters(EventSource source)
         {
             EnableEvents(source, EventLevel.Informational, (EventKeywords)1, new Dictionary<string, string>(){ {"EventCounterInterval", "1" } });
         }

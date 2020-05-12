@@ -5,8 +5,6 @@ using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 
 
-// Try to write another suite using the pipe
-
 namespace CounterBenchmarks
 {
     public class Benchmark
@@ -26,9 +24,18 @@ namespace CounterBenchmarks
         }
 
         [Benchmark]
+        public void WriteEventCounterWithoutListener()
+        {
+            for (int i = 0; i < N; i++)
+            {
+                BMCounterSource.Log.WriteEventCounter(i);
+            }
+        }
+
+        [Benchmark]
         public void WriteEventCounterWithListener()
         {
-            listener.StartListening(BMCounterSource.Log);
+            listener.StartListeningToCounters(BMCounterSource.Log);
             for (int i = 0; i < N; i++)
             {
                 BMCounterSource.Log.WriteEventCounter(i);
@@ -37,13 +44,16 @@ namespace CounterBenchmarks
         }
 
         [Benchmark]
-        public void WriteEventCounterWithoutListener()
+        public void WriteEventCounterWithClient()
         {
+            client.StartListeningToCounters("BM-Counter-Source");
             for (int i = 0; i < N; i++)
             {
                 BMCounterSource.Log.WriteEventCounter(i);
             }
+            client.Stop();
         }
+
 
         [Benchmark]
         public void WritePollingCounterWithoutListener()
@@ -57,12 +67,23 @@ namespace CounterBenchmarks
         [Benchmark]
         public void WritePollingCounterWithListener()
         {
-            listener.StartListening(BMCounterSource.Log);
+            listener.StartListeningToCounters(BMCounterSource.Log);
             for (int i = 0; i < N; i++)
             {
                 BMCounterSource.Log.WriteEventCounter(i);
             }
             listener.StopListening(BMCounterSource.Log);
+        }
+
+        [Benchmark]
+        public void WritePollingCounterWithClient()
+        {
+            client.StartListeningToCounters("BM-Counter-Source");
+            for (int i = 0; i < N; i++)
+            {
+                BMCounterSource.Log.WriteEventCounter(i);
+            }
+            client.Stop();
         }
 
         [Benchmark]
@@ -77,26 +98,12 @@ namespace CounterBenchmarks
         [Benchmark]
         public void WriteIncrementingEventCounterWithListener()
         {
-            listener.StartListening(BMCounterSource.Log);
+            listener.StartListeningToCounters(BMCounterSource.Log);
             for (int i = 0; i < N; i++)
             {
                 BMCounterSource.Log.WriteIncrementingEventCounter(i);
             }
             listener.StopListening(BMCounterSource.Log);
-        }
-
-        [Benchmark]
-        public void RuntimeCounterDisabled()
-        {
-            Thread.Sleep(500);
-        }
-
-        [Benchmark]
-        public void RuntimeCounterEnabledWithListener()
-        {
-            listener.StartListeningRuntimeCounters();
-            Thread.Sleep(500);
-            listener.StopListeningRuntimeCounters();
         }
 
         [Benchmark]
@@ -156,7 +163,6 @@ namespace CounterBenchmarks
             }
             listener.StopListening(BMCounterSource.Log);
         }
-
 
 
         [Benchmark]
@@ -226,6 +232,34 @@ namespace CounterBenchmarks
                 t[i].Start();
             }
             listener.StopListening(BMCounterSource.Log);
+        }
+
+        [Benchmark]
+        public void WriteString1000WithClientWith5Threads()
+        {
+            client.Start("BM-Counter-Source", EventLevel.Informational, (long)3);
+            string bigStr = new string('a', 1000);
+            Thread[] t = new Thread[5];
+            for (int i = 0; i < 5; i++)
+            {
+                t[i] = new Thread(() => { BMCounterSource.Log.WriteEventThree(bigStr); });
+                t[i].Start();
+            }
+            client.Stop();
+        }
+
+        [Benchmark]
+        public void WriteString1000WithClientWith10Threads()
+        {
+            client.Start("BM-Counter-Source", EventLevel.Informational, (long)3);
+            string bigStr = new string('a', 1000);
+            Thread[] t = new Thread[10];
+            for (int i = 0; i < 10; i++)
+            {
+                t[i] = new Thread(() => { BMCounterSource.Log.WriteEventThree(bigStr); });
+                t[i].Start();
+            }
+            client.Stop();
         }
 
         [Benchmark]
