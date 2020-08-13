@@ -16,7 +16,8 @@ namespace corescaletest
     class Program
     {
         private static bool finished = false;
-        static void ThreadProc() {
+        static void ThreadProc()
+        {
             while(true)
             {
                 if (finished)
@@ -24,7 +25,6 @@ namespace corescaletest
                     break;
                 }
                 MySource.Log.FireSmallEvent();
-                Thread.Sleep(10);
             }
         }
 
@@ -50,8 +50,8 @@ namespace corescaletest
                 threads[i].Start();
             }
             
-            Console.WriteLine("Sleeping for 2 minutes");
-            Thread.Sleep(2 * 60 * 1000);
+            Console.WriteLine("Sleeping for 1 minutes");
+            Thread.Sleep(1 * 60 * 1000);
             finished = true;
             
             Console.WriteLine("Done. Goodbye!");
