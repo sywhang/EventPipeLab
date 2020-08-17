@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Security.Principal;
 using System.Diagnostics;
-using System.IO;
 using System.Diagnostics.Tracing;
+using System.IO;
+
+#if _WINDOWS
+using System.Security.Principal;
+#endif // _WINDOWS
+
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -26,18 +30,21 @@ namespace orchestrator
         static void Main(string[] args)
         {
             eventCounts = new Dictionary<int, int>();
+
+#if _WINDOWS
+            // Try to run in admin mode in Windows
             bool isElevated;
             using (WindowsIdentity identity = WindowsIdentity.GetCurrent())
             {
                 WindowsPrincipal principal = new WindowsPrincipal(identity);
                 isElevated = principal.IsInRole(WindowsBuiltInRole.Administrator);
             }
-
             if (!isElevated)
             {
                 Console.WriteLine("Must run in root/admin mode");
                 return;
             }
+#endif // _WINDOWS
             if (args.Length < 1)
             {
                 Console.WriteLine("Usage: dotnet run [path-to-corescaletest.exe]");
