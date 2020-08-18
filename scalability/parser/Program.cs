@@ -65,6 +65,9 @@ namespace parser
             const string fileName = "./temp.nettrace";
             DiagnosticsClient client = new DiagnosticsClient(pid);
             EventPipeSession session = client.StartEventPipeSession(new EventPipeProvider("MySource", EventLevel.Verbose));
+
+            Console.WriteLine("session open");
+
             using (FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.Write))
             {
                 Task copyTask = session.EventStream.CopyToAsync(fs);
