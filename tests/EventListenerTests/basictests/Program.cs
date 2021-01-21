@@ -92,9 +92,9 @@ namespace EventListenerTests
                 Task[] tasks = new Task[100];
                 for (int i = 0; i < 100; i++) 
                 {
-                    tasks[i] = Task.Run(() => { Task.Delay(i*100); someNumber += 1; });
+                    tasks[i] = Task.Run(() => { Task.Delay(i*10000); someNumber += 1; });
                 }
-
+                Task.WaitAll(tasks);
                 Thread.Sleep(1000);
 
                 listener.VerifyMinAndReportError("Test_ThreadPool_Listener", "ThreadPoolWorkerThreadStart", 1);
